@@ -87,14 +87,25 @@
   .addbar { background: var(--card); border: 1px solid var(--border); border-radius: 12px;
     padding: 12px; margin: 0 0 16px; }
   .addbar .inner { display: flex; gap: 8px; align-items: center; }
-  .addbar input { flex: 1; min-width: 0; background: var(--card-2); border: 1px solid var(--border); color: var(--text);
-    padding: 14px 14px; border-radius: 10px; font-size: 16px; font-family: inherit; }
+  .addbar .field { flex: 1; min-width: 0; position: relative; }
+  .addbar input { width: 100%; background: var(--card-2); border: 1px solid var(--border); color: var(--text);
+    padding: 14px 46px 14px 14px; border-radius: 10px; font-size: 16px; font-family: inherit; }
   .addbar input:focus { outline: none; border-color: var(--primary); }
-  .addbar button { padding: 14px 18px; background: var(--primary); color: var(--primary-fg); border: none;
+  .mic { position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 18px; padding: 0; }
+  .mic:hover { border-color: var(--primary); color: var(--primary); }
+  .mic.listening { background: var(--rose); color: white; border-color: var(--rose);
+    animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(251,113,133,.6); } 50% { box-shadow: 0 0 0 10px rgba(251,113,133,0); } }
+  .addbar > button { padding: 14px 18px; background: var(--primary); color: var(--primary-fg); border: none;
     border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 15px; white-space: nowrap; }
-  .addbar button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .addbar > button:disabled { opacity: 0.5; cursor: not-allowed; }
   .addhint { font-size: 12px; color: var(--muted); margin: 8px 4px 0; }
   .addhint b { color: var(--text); font-weight: 600; }
+  .voice-status { font-size: 12px; color: var(--rose); margin: 6px 4px 0; font-weight: 600; display: none; }
+  .voice-status.on { display: block; }
 
   /* Confirm modal */
   .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 30; display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -141,10 +152,14 @@
 
   <div class="addbar">
     <div class="inner">
-      <input id="addInput" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" placeholder="Add item(s) — tap 🎤 on your keyboard to dictate" onkeydown="if(event.key==='Enter') handleAdd()" />
+      <div class="field">
+        <input id="addInput" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" placeholder="Add item(s) — tap 🎤 to dictate" onkeydown="if(event.key==='Enter') handleAdd()" />
+        <button id="micBtn" class="mic" onclick="toggleVoice()" aria-label="Voice input" title="Voice input">🎤</button>
+      </div>
       <button id="addBtn" onclick="handleAdd()">Add</button>
     </div>
-    <div class="addhint"><b>Tip:</b> type naturally — "shower curtain liner and hooks for Target this week" — commas and "and" split into items. Confirm before saving. Use the iPhone keyboard's 🎤 icon for voice dictation.</div>
+    <div class="voice-status" id="voiceStatus">🔴 Listening… speak your items, then pause</div>
+    <div class="addhint"><b>Tip:</b> tap the 🎤 to speak, or type. Say things like <i>"shower curtain liner and hooks for Target this week"</i>. Commas and "and" split into separate items — you'll confirm before saving.</div>
   </div>
 
   <div class="tabs">
@@ -276,6 +291,64 @@ function setStatus(msg, cls) {
   el.textContent = msg;
   el.className = "status " + (cls || "");
 }
+
+// ---------- Voice input (Web Speech API) ----------
+let recog = null;
+let listening = false;
+function initVoice() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = document.getElementById("micBtn");
+  if (!SR) {
+    micBtn.style.opacity = 0.4;
+    micBtn.title = "Voice not supported in this browser — use the keyboard mic instead";
+    micBtn.onclick = () => {
+      alert("Voice input isn't supported by this browser. On iPhone, tap the input then use the 🎤 on the keyboard. On desktop, try Safari or Chrome.");
+    };
+    return;
+  }
+  recog = new SR();
+  recog.continuous = false;
+  recog.interimResults = true;
+  recog.lang = "en-US";
+  const inp = document.getElementById("addInput");
+  const status = document.getElementById("voiceStatus");
+  let finalText = "";
+  recog.onstart = () => {
+    listening = true;
+    finalText = inp.value ? inp.value + " " : "";
+    micBtn.classList.add("listening");
+    status.classList.add("on");
+  };
+  recog.onresult = (e) => {
+    let interim = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalText += t;
+      else interim += t;
+    }
+    inp.value = (finalText + interim).replace(/\s+/g, " ").trim();
+  };
+  recog.onerror = (e) => {
+    console.warn("Speech error:", e.error);
+    stopVoice();
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+      alert("Microphone permission denied. Enable it in Safari > Settings > Websites > Microphone.");
+    }
+  };
+  recog.onend = () => stopVoice();
+}
+function stopVoice() {
+  listening = false;
+  document.getElementById("micBtn").classList.remove("listening");
+  document.getElementById("voiceStatus").classList.remove("on");
+}
+window.toggleVoice = function() {
+  if (!recog) return;
+  if (listening) { try { recog.stop(); } catch(e) {} return; }
+  document.getElementById("addInput").focus();
+  try { recog.start(); } catch(e) { console.warn(e); }
+};
+initVoice();
 
 sb.channel("paladia_todos_ch")
   .on("postgres_changes", { event: "*", schema: "public", table: "paladia_todos", filter: `list_key=eq.${LIST_KEY}` }, (payload) => {
