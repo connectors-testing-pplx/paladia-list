@@ -292,63 +292,171 @@ function setStatus(msg, cls) {
   el.className = "status " + (cls || "");
 }
 
-// ---------- Voice input (Web Speech API) ----------
-let recog = null;
-let listening = false;
-function initVoice() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+// ---------- Voice input (Web Speech API, iOS-hardened) ----------
+// iOS Safari quirks handled here:
+//   * SR must be created + started inside the same user-gesture tick
+//   * continuous:true is unreliable; use single-shot and auto-restart if the user still wants to talk
+//   * onend fires unexpectedly; only treat as "real stop" if we intended to stop or the user tapped again
+//   * getUserMedia primer helps Safari surface the permission prompt cleanly on some iOS builds
+//   * requires HTTPS (GitHub Pages is HTTPS ✓)
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let listening = false;         // user intent — true from tap-start until tap-stop or hard error
+let recog = null;              // current SpeechRecognition instance (single-shot per burst)
+let accumulated = "";          // committed final transcripts across bursts
+let permissionPrimed = false;  // getUserMedia primer run once
+
+function voiceUnsupported(reason) {
   const micBtn = document.getElementById("micBtn");
-  if (!SR) {
-    micBtn.style.opacity = 0.4;
-    micBtn.title = "Voice not supported in this browser — use the keyboard mic instead";
-    micBtn.onclick = () => {
-      alert("Voice input isn't supported by this browser. On iPhone, tap the input then use the 🎤 on the keyboard. On desktop, try Safari or Chrome.");
-    };
-    return;
+  micBtn.style.opacity = 0.4;
+  micBtn.title = reason;
+  micBtn.onclick = () => alert(reason + "\n\nOn iPhone you can still tap the input, then use the 🎤 on the keyboard for dictation.");
+}
+
+if (!SR) {
+  voiceUnsupported("Voice input isn't supported by this browser.");
+} else if (location.protocol !== "https:" && location.hostname !== "localhost") {
+  voiceUnsupported("Voice needs HTTPS to run.");
+}
+
+async function primeMicPermission() {
+  if (permissionPrimed) return true;
+  if (!navigator.mediaDevices?.getUserMedia) { permissionPrimed = true; return true; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach(t => t.stop());
+    permissionPrimed = true;
+    return true;
+  } catch (e) {
+    console.warn("Mic permission denied:", e);
+    return false;
   }
-  recog = new SR();
-  recog.continuous = false;
-  recog.interimResults = true;
-  recog.lang = "en-US";
+}
+
+function buildRecog() {
+  const r = new SR();
+  r.continuous = false;      // iOS reliability: single burst
+  r.interimResults = true;
+  r.maxAlternatives = 1;
+  r.lang = navigator.language || "en-US";
   const inp = document.getElementById("addInput");
+  const micBtn = document.getElementById("micBtn");
   const status = document.getElementById("voiceStatus");
-  let finalText = "";
-  recog.onstart = () => {
-    listening = true;
-    finalText = inp.value ? inp.value + " " : "";
+
+  r.onstart = () => {
     micBtn.classList.add("listening");
     status.classList.add("on");
+    status.textContent = "🔴 Listening… speak, then pause. Tap 🎤 again to stop.";
   };
-  recog.onresult = (e) => {
+  r.onresult = (e) => {
     let interim = "";
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const t = e.results[i][0].transcript;
-      if (e.results[i].isFinal) finalText += t;
+      if (e.results[i].isFinal) accumulated += t + " ";
       else interim += t;
     }
-    inp.value = (finalText + interim).replace(/\s+/g, " ").trim();
+    inp.value = (accumulated + interim).replace(/\s+/g, " ").trim();
   };
-  recog.onerror = (e) => {
-    console.warn("Speech error:", e.error);
-    stopVoice();
+  r.onerror = (e) => {
+    console.warn("Speech error:", e.error, e.message || "");
+    // Recoverable transient errors on iOS: no-speech, audio-capture, network. Silently retry if user still wants to.
+    if (e.error === "no-speech" || e.error === "aborted") return;
     if (e.error === "not-allowed" || e.error === "service-not-allowed") {
-      alert("Microphone permission denied. Enable it in Safari > Settings > Websites > Microphone.");
+      listening = false;
+      stopUI();
+      alert("Microphone permission was denied.\n\nEnable it: iPhone Settings → Safari → Microphone → Allow, and Settings → Safari → Advanced → Website Data → remove this site to reset.");
+      return;
+    }
+    if (e.error === "network") {
+      listening = false;
+      stopUI();
+      alert("Voice needs an internet connection to transcribe. Reconnect and try again.");
+      return;
     }
   };
-  recog.onend = () => stopVoice();
+  r.onend = () => {
+    // Single-burst ended. If user still wants to talk, restart in a microtask (iOS needs a beat).
+    if (listening) {
+      setTimeout(() => {
+        if (!listening) return;
+        try { r.start(); } catch (err) {
+          // Safari sometimes rejects rapid restart with InvalidStateError — rebuild recog.
+          try {
+            recog = buildRecog();
+            recog.start();
+          } catch (err2) {
+            console.warn("Restart failed:", err2);
+            listening = false;
+            stopUI();
+          }
+        }
+      }, 250);
+    } else {
+      stopUI();
+    }
+  };
+  return r;
 }
-function stopVoice() {
-  listening = false;
+
+function stopUI() {
   document.getElementById("micBtn").classList.remove("listening");
   document.getElementById("voiceStatus").classList.remove("on");
 }
-window.toggleVoice = function() {
-  if (!recog) return;
-  if (listening) { try { recog.stop(); } catch(e) {} return; }
-  document.getElementById("addInput").focus();
-  try { recog.start(); } catch(e) { console.warn(e); }
+
+window.toggleVoice = async function() {
+  if (!SR) return;
+  const inp = document.getElementById("addInput");
+
+  // Tap to stop
+  if (listening) {
+    listening = false;
+    try { recog && recog.stop(); } catch (e) {}
+    stopUI();
+    return;
+  }
+
+  // Tap to start
+  // Prime permission on first tap so Safari's popup appears cleanly.
+  const ok = await primeMicPermission();
+  if (!ok) {
+    alert("Microphone permission is required.\n\nEnable it: iPhone Settings → Safari → Microphone → Allow. Then reload this page.");
+    return;
+  }
+
+  // Start fresh: seed accumulated with what's already typed so we append cleanly
+  accumulated = inp.value ? inp.value.trim() + " " : "";
+  listening = true;
+  try {
+    recog = buildRecog();
+    recog.start();
+  } catch (e) {
+    console.warn("start() threw:", e);
+    listening = false;
+    stopUI();
+    // Wait a tick and try once more with a fresh instance (iOS InvalidStateError workaround)
+    setTimeout(() => {
+      if (listening) return;
+      try {
+        listening = true;
+        recog = buildRecog();
+        recog.start();
+      } catch (e2) {
+        listening = false;
+        stopUI();
+        alert("Voice couldn't start. Try again in a second.");
+      }
+    }, 400);
+  }
 };
-initVoice();
+
+// Stop cleanly if the page goes to background (iOS pauses speech recognition anyway)
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && listening) {
+    listening = false;
+    try { recog && recog.stop(); } catch (e) {}
+    stopUI();
+  }
+});
 
 sb.channel("paladia_todos_ch")
   .on("postgres_changes", { event: "*", schema: "public", table: "paladia_todos", filter: `list_key=eq.${LIST_KEY}` }, (payload) => {
