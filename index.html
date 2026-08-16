@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Paladia Move Day — Tonight & Tomorrow</title>
+<meta name="theme-color" content="#0b0b0e" />
+<style>
+  :root {
+    --bg: #0b0b0e;
+    --card: #14141a;
+    --card-2: #1b1b23;
+    --border: #26262f;
+    --text: #f4f4f6;
+    --muted: #9aa0aa;
+    --primary: #7dd3fc;
+    --primary-fg: #0b0b0e;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --rose: #fb7185;
+    --purple: #c084fc;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px; line-height: 1.45; }
+  a { color: var(--primary); text-decoration: none; }
+  header { position: sticky; top: 0; z-index: 10; background: rgba(11,11,14,.9);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+    padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; }
+  header .brand { font-weight: 700; letter-spacing: -.01em; }
+  header .count { font-size: 12px; color: var(--muted); }
+  main { max-width: 720px; margin: 0 auto; padding: 16px; padding-bottom: 80px; }
+  .intro { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+  .intro h1 { margin: 0 0 6px; font-size: 18px; }
+  .intro p { margin: 6px 0; color: var(--muted); font-size: 14px; }
+  .banner { background: rgba(125,211,252,.08); border: 1px solid rgba(125,211,252,.35); border-radius: 10px; padding: 12px; margin: 10px 0; }
+  .banner .h { color: var(--primary); font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .banner p { color: var(--muted); margin: 6px 0 8px; font-size: 14px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    border: 1px solid var(--border); background: var(--card-2); color: var(--text); cursor: pointer; }
+  .btn.primary { background: var(--primary); color: var(--primary-fg); border-color: transparent; }
+  .btn.small { padding: 6px 10px; font-size: 13px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tabs .btn { flex: 1; justify-content: center; }
+  .filter { margin-bottom: 20px; }
+  .filter .label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .filter .row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .section { margin-bottom: 24px; }
+  .section h3 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+    margin: 0 0 10px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+  .section h3 .n { font-weight: 500; }
+  .item { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
+  .item.done { opacity: .55; background: var(--card-2); }
+  .item.done .title { text-decoration: line-through; color: var(--muted); }
+  .item input[type=checkbox] { flex: 0 0 auto; width: 22px; height: 22px; accent-color: var(--primary); margin-top: 2px; }
+  .item .body { flex: 1; min-width: 0; }
+  .item .title { font-weight: 600; margin: 0 0 4px; }
+  .item .detail { color: var(--muted); font-size: 14px; margin: 0 0 8px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 6px; align-items: center; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid; font-weight: 600; }
+  .b-must { background: rgba(255,255,255,.06); border-color: var(--border); color: var(--text); }
+  .b-fun { background: rgba(192,132,252,.1); border-color: rgba(192,132,252,.3); color: var(--purple); }
+  .b-low { background: rgba(52,211,153,.1); border-color: rgba(52,211,153,.3); color: var(--green); }
+  .b-med { background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.3); color: var(--amber); }
+  .b-high { background: rgba(251,113,133,.1); border-color: rgba(251,113,133,.3); color: var(--rose); }
+  .energy { font-size: 11px; color: var(--muted); }
+  .maplinks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .maplinks a { background: rgba(125,211,252,.08); border: 1px solid rgba(125,211,252,.3); color: var(--primary);
+    font-size: 12px; padding: 4px 10px; border-radius: 6px; }
+  .stops { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-top: 20px; }
+  .stops h3 { margin: 0 0 10px; font-size: 14px; }
+  .stops a { display: flex; justify-content: space-between; gap: 12px; padding: 10px; border-radius: 8px; color: var(--text); font-size: 14px; }
+  .stops a:hover { background: rgba(255,255,255,.03); }
+  .stops .r { text-align: right; color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .reset { text-align: center; margin: 20px 0; }
+  .reset button { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; text-decoration: underline; }
+  @media (max-width: 500px) {
+    .item .detail { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Paladia · Move Day</div>
+  <div class="count" id="count">0/0 tonight musts</div>
+</header>
+<main>
+  <div class="intro">
+    <h1>Tonight & Tomorrow</h1>
+    <p>Key fob is in hand. Bed is arriving 7-8 PM. Utilities, insurance, and payment are handled.</p>
+    <div class="banner">
+      <div class="h">🛒 Tonight: one stop only — Target Culver City</div>
+      <p>Everything below is stocked at SuperTarget. 8 min drive, one park, one checkout, back to the unit before the bed arrives.</p>
+      <a class="btn primary small" target="_blank" rel="noreferrer"
+         href="https://www.google.com/maps/dir/?api=1&origin=6565+Crescent+Park+West+%23417%2C+Playa+Vista%2C+CA+90094&destination=10820+Jefferson+Blvd%2C+Culver+City%2C+CA+90230">
+        📍 Directions to Target
+      </a>
+    </div>
+    <p style="font-size:13px">Progress saves on this device. Bill and DeNae each have their own list — divide and conquer.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="btn primary" id="tab-tonight" onclick="setTab('tonight')">🌙 Tonight</button>
+    <button class="btn" id="tab-tomorrow" onclick="setTab('tomorrow')">☀️ Tomorrow</button>
+  </div>
+
+  <div class="filter">
+    <div class="label">How's your energy right now?</div>
+    <div class="row" id="energyRow"></div>
+  </div>
+
+  <div id="sections"></div>
+
+  <div class="stops">
+    <h3>📍 All stops</h3>
+    <div id="stopsList"></div>
+  </div>
+
+  <div class="reset"><button onclick="resetChecks()">Reset all checks</button></div>
+</main>
+
+<script>
+const UNIT = "6565 Crescent Park West #417, Playa Vista, CA 90094";
+const mapUrl = (addr) => `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(UNIT)}&destination=${encodeURIComponent(addr)}`;
+
+const STOPS = {
+  target: { name: "Target — Culver City (one-stop tonight)", addr: "10820 Jefferson Blvd, Culver City, CA 90230", hours: "Open until 10 PM (Sat) / 9 PM (Sun)", walk: "8 min drive — covers everything for tonight" },
+  bbb: { name: "HomeGoods — Culver City", addr: "10800 Jefferson Blvd, Culver City, CA 90230", hours: "Open until 9:30 PM", walk: "Next to Target" },
+  hdButtercup: { name: "HD Buttercup", addr: "3225 Helms Ave, Los Angeles, CA 90034", hours: "Sun 11 AM – 6 PM", walk: "15 min drive — furniture destination" },
+  livingSpaces: { name: "Living Spaces — Culver City", addr: "6001 Sepulveda Blvd, Culver City, CA 90230", hours: "Sun 10 AM – 9 PM", walk: "10 min drive — sofa/chairs/dining" },
+  westElm: { name: "West Elm — Santa Monica", addr: "1811 Wilshire Blvd, Santa Monica, CA 90403", hours: "Sun 11 AM – 7 PM", walk: "15 min drive — dressers, coffee tables" },
+  cb2: { name: "CB2 — Santa Monica Promenade", addr: "1401 3rd Street Promenade, Santa Monica, CA 90401", hours: "Sun 10 AM – 9 PM", walk: "15 min drive — modern accents" },
+};
+
+const rank = { low: 1, medium: 2, high: 3 };
+
+const ITEMS = [
+  // TONIGHT
+  { id:"t-tp", when:"tonight", title:"Toilet paper", detail:"Grab a 6-pack — you're stocking, not just surviving.", stops:["target"], effort:"low", energy:"low", mandatory:true, group:"Bathroom essentials" },
+  { id:"t-towels", when:"tonight", title:"Bath towel + hand towel + washcloth", detail:"Threshold or Casaluna. Grab 2 bath towels if pricing works.", stops:["target"], effort:"low", energy:"low", mandatory:true, group:"Bathroom essentials" },
+  { id:"t-toiletries", when:"tonight", title:"Toothbrush, toothpaste, deodorant, body wash, shampoo", detail:"Full sizes — you're moving in, not traveling.", stops:["target"], effort:"low", energy:"low", mandatory:true, group:"Bathroom essentials" },
+  { id:"t-soap", when:"tonight", title:"Hand soap for the sink", stops:["target"], effort:"low", energy:"low", mandatory:true, group:"Bathroom essentials" },
+  { id:"t-duvet", when:"tonight", title:"Duvet or comforter (King)", detail:"Sheets handled. King duvet + insert or all-in-one comforter. Threshold/Casaluna.", stops:["target"], effort:"medium", energy:"medium", mandatory:true, group:"Bedroom" },
+  { id:"t-pillow", when:"tonight", title:"Pillows (grab 2)", detail:"Standard/Queen. 2 for the bed, one for the couch later.", stops:["target"], effort:"low", energy:"low", mandatory:true, group:"Bedroom" },
+  { id:"t-trash", when:"tonight", title:"Trash bags (13 gal)", detail:"Tall kitchen + small bathroom bags.", stops:["target"], effort:"low", energy:"low", mandatory:true, group:"Utility" },
+  { id:"t-water", when:"tonight", title:"Water + breakfast + snacks", detail:"Case of water, bananas/yogurt/granola, one dinner option.", stops:["target"], effort:"low", energy:"low", mandatory:true, group:"Utility" },
+  { id:"t-paper", when:"tonight", title:"Paper towels", detail:"One pack.", stops:["target"], effort:"low", energy:"low", mandatory:true, group:"Utility" },
+  { id:"t-charger", when:"tonight", title:"Phone charger + power strip", detail:"Only if yours are packed.", stops:["target"], effort:"low", energy:"low", group:"Nice to have" },
+  { id:"t-bathmat", when:"tonight", title:"Bath mat", detail:"Nice to step onto after your first shower. Skippable.", stops:["target"], effort:"low", energy:"medium", group:"Nice to have" },
+  { id:"t-lightbulb", when:"tonight", title:"One lamp or nightlight", detail:"Only if bedroom light is harsh.", stops:["target"], effort:"low", energy:"medium", group:"Nice to have" },
+
+  // TOMORROW
+  { id:"s-hdbuttercup", when:"tomorrow", title:"HD Buttercup browse", detail:"Best vibe for the 2 living-room chairs + coffee table. Aesthetic-first.", stops:["hdButtercup"], effort:"medium", energy:"medium", fun:true, group:"Fun furniture crawl (pick any / all)" },
+  { id:"s-westelm", when:"tomorrow", title:"West Elm — Santa Monica", detail:"Dressers, coffee tables, nightstands. Order in-store.", stops:["westElm"], effort:"medium", energy:"medium", fun:true, group:"Fun furniture crawl (pick any / all)" },
+  { id:"s-cb2", when:"tomorrow", title:"CB2 — Santa Monica Promenade", detail:"Modern accents, dining bench, small tables.", stops:["cb2"], effort:"low", energy:"medium", fun:true, group:"Fun furniture crawl (pick any / all)" },
+  { id:"s-living", when:"tomorrow", title:"Living Spaces — Culver City", detail:"Widest selection, fastest delivery.", stops:["livingSpaces"], effort:"medium", energy:"medium", fun:true, group:"Fun furniture crawl (pick any / all)" },
+  { id:"s-kitchen", when:"tomorrow", title:"Kitchen starter kit", detail:"Plates, utensils for 2, one pan, dish soap, sponge, coffee setup.", stops:["target"], effort:"medium", energy:"medium", group:"Practical Sunday" },
+  { id:"s-cleaning", when:"tomorrow", title:"Cleaning basics", detail:"All-purpose spray, broom, laundry detergent.", stops:["target"], effort:"low", energy:"medium", group:"Practical Sunday" },
+  { id:"s-bath2", when:"tomorrow", title:"Bathroom round 2 (if needed)", detail:"Shower curtain, extra towels.", stops:["target","bbb"], effort:"low", energy:"low", group:"Practical Sunday" },
+  { id:"s-oldhouse", when:"tomorrow", title:"Move couch, desk, monitors from old house", detail:"Biggest lift. Do this morning when energy is high.", stops:[], effort:"high", energy:"high", group:"Practical Sunday" },
+  { id:"s-lamps", when:"tomorrow", title:"Bedroom floor lamp", detail:"HomeGoods for value; West Elm for design.", stops:["bbb","target","westElm"], effort:"low", energy:"low", fun:true, group:"If energy is high" },
+  { id:"s-rugs", when:"tomorrow", title:"Scout a rug for the living room", detail:"Anchors everything. HomeGoods often has a hit under $200.", stops:["bbb","westElm"], effort:"medium", energy:"medium", fun:true, group:"If energy is high" },
+  { id:"s-food", when:"tomorrow", title:"Nice lunch or coffee mid-crawl", detail:"Reward between stores.", stops:[], effort:"low", energy:"low", fun:true, group:"If energy is high" },
+];
+
+const KEY = "paladia.moveday.public.v1";
+let checks = {};
+let tab = "tonight";
+let energy = "all";
+try { checks = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e) { checks = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(checks)); } catch(e) {} };
+const toggle = (id) => { checks[id] = !checks[id]; save(); render(); };
+function resetChecks() { if (confirm("Clear all checks?")) { checks = {}; save(); render(); } }
+
+function setTab(t) { tab = t; render(); }
+function setEnergy(e) { energy = e; render(); }
+
+const ENERGY_OPTIONS = [
+  ["all","Show all"],
+  ["low","Low — just the musts"],
+  ["medium","Mid — some extras"],
+  ["high","High — bring it on"],
+];
+
+function render() {
+  // header count
+  const musts = ITEMS.filter(i => i.when === "tonight" && i.mandatory);
+  const done = musts.filter(i => checks[i.id]).length;
+  document.getElementById("count").textContent = `${done}/${musts.length} tonight musts`;
+
+  // tabs
+  document.getElementById("tab-tonight").className = "btn " + (tab === "tonight" ? "primary" : "");
+  document.getElementById("tab-tomorrow").className = "btn " + (tab === "tomorrow" ? "primary" : "");
+
+  // energy filter buttons
+  const er = document.getElementById("energyRow");
+  er.innerHTML = "";
+  ENERGY_OPTIONS.forEach(([val, label]) => {
+    const b = document.createElement("button");
+    b.className = "btn small " + (energy === val ? "primary" : "");
+    b.textContent = label;
+    b.onclick = () => setEnergy(val);
+    er.appendChild(b);
+  });
+
+  // items
+  const items = ITEMS.filter(i => i.when === tab).filter(i => energy === "all" || rank[i.energy] <= rank[energy]);
+  const groups = {};
+  items.forEach(i => { (groups[i.group] = groups[i.group] || []).push(i); });
+
+  const sectionsEl = document.getElementById("sections");
+  sectionsEl.innerHTML = "";
+  if (items.length === 0) {
+    sectionsEl.innerHTML = '<p style="text-align:center;color:var(--muted);padding:24px 0">Nothing matches this energy level. Widen the filter.</p>';
+  }
+  Object.entries(groups).forEach(([groupName, groupItems]) => {
+    const dn = groupItems.filter(i => checks[i.id]).length;
+    const sec = document.createElement("div");
+    sec.className = "section";
+    sec.innerHTML = `<h3>${escapeHtml(groupName)}<span class="n">${dn}/${groupItems.length}</span></h3>`;
+    groupItems.forEach(i => sec.appendChild(itemEl(i)));
+    sectionsEl.appendChild(sec);
+  });
+
+  // stops
+  const s = document.getElementById("stopsList");
+  s.innerHTML = "";
+  Object.values(STOPS).forEach(st => {
+    const a = document.createElement("a");
+    a.href = mapUrl(st.addr);
+    a.target = "_blank"; a.rel = "noreferrer";
+    a.innerHTML = `<div><div style="font-weight:600">${escapeHtml(st.name)}</div><div style="font-size:12px;color:var(--muted)">${escapeHtml(st.addr)}</div></div><div class="r"><div>${escapeHtml(st.hours)}</div><div>${escapeHtml(st.walk)}</div></div>`;
+    s.appendChild(a);
+  });
+}
+
+function itemEl(i) {
+  const div = document.createElement("div");
+  div.className = "item" + (checks[i.id] ? " done" : "");
+  const cb = document.createElement("input");
+  cb.type = "checkbox"; cb.checked = !!checks[i.id];
+  cb.onchange = () => toggle(i.id);
+  div.appendChild(cb);
+  const body = document.createElement("div");
+  body.className = "body";
+  const badges = [];
+  if (i.mandatory) badges.push('<span class="badge b-must">Must</span>');
+  if (i.fun) badges.push('<span class="badge b-fun">✨ Fun</span>');
+  const effortLabel = i.effort === "low" ? "Easy" : i.effort === "medium" ? "Medium" : "Big lift";
+  const effortClass = i.effort === "low" ? "b-low" : i.effort === "medium" ? "b-med" : "b-high";
+  badges.push(`<span class="badge ${effortClass}">${effortLabel}</span>`);
+  const energyLabel = i.energy === "low" ? "Any energy" : i.energy === "medium" ? "Mid energy" : "High energy";
+  const maps = (i.stops || []).map(sid => {
+    const st = STOPS[sid];
+    if (!st) return "";
+    return `<a href="${mapUrl(st.addr)}" target="_blank" rel="noreferrer">📍 ${escapeHtml(st.name.split(" — ")[0])}</a>`;
+  }).join("");
+  body.innerHTML = `
+    <div class="title" onclick="event.stopPropagation()">${escapeHtml(i.title)}</div>
+    ${i.detail ? `<div class="detail">${escapeHtml(i.detail)}</div>` : ""}
+    <div class="badges">${badges.join("")}<span class="energy">· ${energyLabel}</span></div>
+    ${maps ? `<div class="maplinks">${maps}</div>` : ""}
+  `;
+  // clicking anywhere on the item toggles
+  div.addEventListener("click", (e) => {
+    if (e.target.tagName === "A" || e.target.tagName === "INPUT") return;
+    toggle(i.id);
+  });
+  div.appendChild(body);
+  return div;
+}
+
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+render();
+</script>
+</body>
+</html>
