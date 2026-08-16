@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Paladia Move Day — Tonight & Tomorrow</title>
+<title>Paladia · Sunday Drive</title>
 <meta name="theme-color" content="#0b0b0e" />
 <style>
   :root {
@@ -71,6 +71,8 @@
   .b-low { background: rgba(52,211,153,.1); border-color: rgba(52,211,153,.3); color: var(--green); }
   .b-med { background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.3); color: var(--amber); }
   .b-high { background: rgba(251,113,133,.1); border-color: rgba(251,113,133,.3); color: var(--rose); }
+  .b-maybe { background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.3); color: var(--amber); }
+  .b-solo { background: rgba(125,211,252,.1); border-color: rgba(125,211,252,.3); color: var(--primary); }
   .energy { font-size: 11px; color: var(--muted); }
   .maplinks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
   .maplinks a { background: rgba(125,211,252,.08); border: 1px solid rgba(125,211,252,.3); color: var(--primary);
@@ -80,6 +82,11 @@
   .stops a { display: flex; justify-content: space-between; gap: 12px; padding: 10px; border-radius: 8px; color: var(--text); font-size: 14px; }
   .stops a:hover { background: rgba(255,255,255,.03); }
   .stops .r { text-align: right; color: var(--muted); font-size: 12px; white-space: nowrap; }
+  .route { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+  .route h3 { margin: 0 0 10px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+  .route ol { margin: 0; padding-left: 20px; }
+  .route li { margin-bottom: 6px; font-size: 14px; }
+  .route li .m { color: var(--muted); font-size: 12px; }
   .reset { text-align: center; margin: 20px 0; }
   .reset button { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; text-decoration: underline; }
 
@@ -131,46 +138,56 @@
 <body>
 <header>
   <div>
-    <div class="brand">Paladia · Move Day</div>
+    <div class="brand">Paladia · Sunday Drive</div>
     <div class="who">You: <span id="me">…</span> <span class="status" id="syncStatus">connecting…</span></div>
   </div>
-  <div class="count" id="count">0/0 tonight musts</div>
+  <div class="count" id="count">0/0 stops</div>
 </header>
 <main>
   <div class="intro">
-    <h1>Tonight & Tomorrow</h1>
-    <p>Key fob is in hand. Utilities, insurance, and payment are handled. Add items to the shared list anytime — Bill and DeNae see the same list live.</p>
+    <h1>Sunday, Aug 16 — On the road</h1>
+    <p>Yesterday's list is all checked. You're leaving Whole Foods PV now. Enzo's grooming pickup at West LA Dogs is around 2:30 PM (unconfirmed — call to check). Then drop DeNae, then Bill goes solo for essentials + Wi-Fi/admin.</p>
     <div class="banner">
-      <div class="h">🛒 Tonight round 2 — Target Culver City</div>
-      <p>Target is open until 10 PM. Bill's heading back for the shower curtain liner + hooks. DeNae is home for the mattress.</p>
+      <div class="h">🚗 Next up — drive-by the bungalow</div>
+      <p>Quick pass. From there, straight to the Venice Canals for a walk while you wait on Enzo's ready-time.</p>
       <a class="btn primary small" target="_blank" rel="noreferrer"
-         href="https://www.google.com/maps/dir/?api=1&origin=6565+Crescent+Park+West+%23417%2C+Playa+Vista%2C+CA+90094&destination=10820+Jefferson+Blvd%2C+Culver+City%2C+CA+90230">
-        📍 Directions to Target
+         href="https://www.google.com/maps/dir/?api=1&origin=Whole+Foods+Market+Playa+Vista+CA&destination=Venice+Canal+Historic+District%2C+Venice%2C+CA+90291&waypoints=Bungalow+drive-by+Playa+Vista+CA">
+        📍 Route: Whole Foods → Bungalow → Venice Canals
       </a>
     </div>
+    <div class="banner" style="background:rgba(251,191,36,.06);border-color:rgba(251,191,36,.35)">
+      <div class="h" style="color:var(--amber)">🐶 Enzo pickup — West LA Dogs</div>
+      <p>Big Dog Building · 2251 Federal Ave, LA 90064 · (310) 597-0424. Sunday hours 9 AM–6 PM. Call before you leave the canals to lock in the ready-time.</p>
+      <a class="btn primary small" target="_blank" rel="noreferrer"
+         href="tel:+13105970424" style="margin-right:6px">📞 Call West LA Dogs</a>
+      <a class="btn small" target="_blank" rel="noreferrer"
+         href="https://www.google.com/maps/dir/?api=1&origin=Venice+Canal+Historic+District%2C+Venice%2C+CA&destination=2251+Federal+Ave%2C+Los+Angeles%2C+CA+90064">
+        📍 Canals → West LA Dogs
+      </a>
+    </div>
+  </div>
+
+  <div class="route">
+    <h3>Today's route <span style="font-weight:400;color:var(--muted);font-size:12px">tap any leg for directions</span></h3>
+    <ol id="routeList"></ol>
   </div>
 
   <div class="addbar">
     <div class="inner">
       <div class="field">
-        <input id="addInput" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" placeholder="Add item(s) — tap 🎤 to dictate" onkeydown="if(event.key==='Enter') handleAdd()" />
+        <input id="addInput" enterkeyhint="done" autocomplete="off" autocapitalize="sentences" placeholder="Add stop or task — tap 🎤 to dictate" onkeydown="if(event.key==='Enter') handleAdd()" />
         <button id="micBtn" class="mic" onclick="toggleVoice()" aria-label="Voice input" title="Voice input">🎤</button>
       </div>
       <button id="addBtn" onclick="handleAdd()">Add</button>
     </div>
-    <div class="voice-status" id="voiceStatus">🔴 Listening… speak your items, then pause</div>
-    <div class="addhint"><b>Tip:</b> tap the 🎤 to speak, or type. Say things like <i>"shower curtain liner and hooks for Target this week"</i>. Commas and "and" split into separate items — you'll confirm before saving.</div>
+    <div class="voice-status" id="voiceStatus">🔴 Listening… speak, then pause</div>
+    <div class="addhint"><b>Tip:</b> tap 🎤 to speak, or type. Say things like <i>"gas station on the way home tonight"</i>. Bill and DeNae see the same list live.</div>
   </div>
 
   <div class="tabs">
-    <button class="btn primary" id="tab-tonight" onclick="setTab('tonight')">🌙 Tonight</button>
-    <button class="btn" id="tab-tomorrow" onclick="setTab('tomorrow')">☀️ Tomorrow</button>
+    <button class="btn primary" id="tab-today" onclick="setTab('today')">🌞 Today</button>
+    <button class="btn" id="tab-solo" onclick="setTab('solo')">🧑 Solo (Bill)</button>
     <button class="btn" id="tab-week" onclick="setTab('week')">📅 This week</button>
-  </div>
-
-  <div class="filter">
-    <div class="label">Energy filter</div>
-    <div class="row" id="energyRow"></div>
   </div>
 
   <div id="sections"></div>
@@ -205,78 +222,83 @@ document.getElementById("me").textContent = me;
 
 // ---------- Stops ----------
 const UNIT = "6565 Crescent Park West #417, Playa Vista, CA 90094";
+const WHOLE_FOODS_PV = "Whole Foods Market, 12746 W Jefferson Blvd, Playa Vista, CA 90094";
+const VENICE_CANALS = "Venice Canal Historic District, Venice, CA 90291";
+const WEST_LA_DOGS = "2251 Federal Ave, Los Angeles, CA 90064";
+const DENAE_HOME = "DeNae apartment (add address)"; // TODO: real drop-off address
+
 const mapUrl = (addr) => `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(UNIT)}&destination=${encodeURIComponent(addr)}`;
+const legUrl = (from, to) => `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}`;
 
 const STOPS = {
-  target: { name: "Target — Culver City", addr: "10820 Jefferson Blvd, Culver City, CA 90230", hours: "Open until 10 PM", walk: "8 min drive" },
-  bbb: { name: "HomeGoods — Culver City", addr: "10800 Jefferson Blvd, Culver City, CA 90230", hours: "Open until 9:30 PM", walk: "Next to Target" },
-  hdButtercup: { name: "HD Buttercup", addr: "3225 Helms Ave, Los Angeles, CA 90034", hours: "Sun 11 AM – 6 PM", walk: "15 min drive" },
-  livingSpaces: { name: "Living Spaces — Culver City", addr: "6001 Sepulveda Blvd, Culver City, CA 90230", hours: "Sun 10 AM – 9 PM", walk: "10 min drive" },
-  westElm: { name: "West Elm — Santa Monica", addr: "1811 Wilshire Blvd, Santa Monica, CA 90403", hours: "Sun 11 AM – 7 PM", walk: "15 min drive" },
-  cb2: { name: "CB2 — Santa Monica Promenade", addr: "1401 3rd Street Promenade, Santa Monica, CA 90401", hours: "Sun 10 AM – 9 PM", walk: "15 min drive" },
+  wholefoods: { name: "Whole Foods — Playa Vista", addr: "12746 W Jefferson Blvd, Playa Vista, CA 90094", hours: "Sun 7 AM – 10 PM", walk: "Starting point" },
+  bungalow: { name: "Bungalow — drive-by", addr: "Playa Vista, CA", hours: "Quick pass", walk: "You know the spot" },
+  canals: { name: "Venice Canals", addr: "Venice Canal Historic District, Venice, CA 90291", hours: "Open daily", walk: "10 min drive from PV" },
+  hdButtercup: { name: "HD Buttercup", addr: "3225 Helms Ave, Los Angeles, CA 90034", hours: "Sun 11 AM – 6 PM", walk: "Furniture optional" },
+  livingSpaces: { name: "Living Spaces — Culver City", addr: "6001 Sepulveda Blvd, Culver City, CA 90230", hours: "Sun 10 AM – 9 PM", walk: "Furniture optional" },
+  westElm: { name: "West Elm — Santa Monica", addr: "1811 Wilshire Blvd, Santa Monica, CA 90403", hours: "Sun 11 AM – 7 PM", walk: "Furniture optional" },
+  cb2: { name: "CB2 — Santa Monica Promenade", addr: "1401 3rd Street Promenade, Santa Monica, CA 90401", hours: "Sun 10 AM – 9 PM", walk: "Furniture optional" },
+  westLaDogs: { name: "West LA Dogs (Enzo pickup)", addr: "2251 Federal Ave, Los Angeles, CA 90064", hours: "Sun 9 AM – 6 PM · (310) 597-0424", walk: "~2:30 PM target — call to confirm" },
+  denaeHome: { name: "DeNae's apartment (drop-off)", addr: "", hours: "", walk: "Add address" },
+  target: { name: "Target — Culver City", addr: "10820 Jefferson Blvd, Culver City, CA 90230", hours: "Open until 10 PM", walk: "Essentials run" },
+  paladia: { name: "Paladia unit 417 (home)", addr: "6565 Crescent Park West, Playa Vista, CA 90094", hours: "Wi-Fi + admin", walk: "End of day" },
   amazon: { name: "Amazon (order online)", addr: "", hours: "", walk: "Delivered" },
 };
 
 const rank = { low: 1, medium: 2, high: 3 };
 
+// ---------- Route legs (rendered in the route card) ----------
+const ROUTE = [
+  { from: WHOLE_FOODS_PV, to: "Bungalow drive-by, Playa Vista, CA", label: "Whole Foods PV → Bungalow drive-by", note: "Quick pass — no stop" },
+  { from: "Bungalow drive-by, Playa Vista, CA", to: VENICE_CANALS, label: "Bungalow → Venice Canals", note: "Walk while you wait on Enzo's ready-time" },
+  { from: VENICE_CANALS, to: null, label: "☎️ Call West LA Dogs from the canals", note: "Confirm Enzo's ready-time (target 2:30 PM)", tel: "+13105970424" },
+  { from: VENICE_CANALS, to: "HD Buttercup, 3225 Helms Ave, Los Angeles, CA 90034", label: "Optional: one furniture looky-loo", note: "Only if time before pickup", maybe: true },
+  { from: null, to: WEST_LA_DOGS, label: "→ West LA Dogs (Enzo pickup)", note: "2251 Federal Ave, LA 90064" },
+  { from: WEST_LA_DOGS, to: DENAE_HOME, label: "→ Drop DeNae + Enzo at her apartment", note: "Address TBD — add it in the app" },
+  { from: null, to: null, label: "🧑 Bill solo the rest of the day", note: "Essentials, then home for Wi-Fi + admin", solo: true },
+];
+
 // ---------- Static base items ----------
 const BASE_ITEMS = [
-  // TONIGHT ROUND 2 — new (shower curtain trip)
-  { id:"t2-liner", when:"tonight", title:"Waterproof shower curtain liner", detail:"Vinyl or PEVA. Hookless is fine — the outer curtain is the pretty one.", stops:["target"], effort:"low", energy:"low", mandatory:true, group:"Tonight round 2 (Target)" },
-  { id:"t2-hooks", when:"tonight", title:"Shower curtain hooks (12-pack)", detail:"Metal or rustproof plastic. Any set of 12.", stops:["target"], effort:"low", energy:"low", mandatory:true, group:"Tonight round 2 (Target)" },
-  { id:"t2-curtain", when:"tonight", title:"Shower curtain (outer)", detail:"Only if you didn't grab one earlier. Threshold section.", stops:["target"], effort:"low", energy:"low", group:"Tonight round 2 (Target)" },
+  // TODAY — the drive
+  { id:"d-leave-wf", when:"today", title:"Leave Whole Foods PV", detail:"Groceries in the car? Good.", stops:["wholefoods"], effort:"low", energy:"low", mandatory:true, group:"The drive" },
+  { id:"d-bungalow", when:"today", title:"Drive by the bungalow", detail:"Quick pass — don't stop long.", stops:["bungalow"], effort:"low", energy:"low", group:"The drive" },
+  { id:"d-canals", when:"today", title:"Venice Canals walk", detail:"Stretch legs, kill time before Enzo's ready.", stops:["canals"], effort:"low", energy:"low", group:"The drive" },
+  { id:"d-call-groomer", when:"today", title:"Call West LA Dogs from the canals", detail:"(310) 597-0424 · confirm Enzo's ready-time. Target ~2:30 PM.", stops:["westLaDogs"], effort:"low", energy:"low", mandatory:true, group:"The drive" },
 
-  // TONIGHT ROUND 1 — pre-checked as done
-  { id:"t-tp", when:"tonight", title:"Toilet paper", detail:"Round 1.", stops:["target"], effort:"low", energy:"low", group:"Tonight round 1 (done)" },
-  { id:"t-towels", when:"tonight", title:"Bath towels + hand towel + washcloth", detail:"Round 1.", stops:["target"], effort:"low", energy:"low", group:"Tonight round 1 (done)" },
-  { id:"t-toiletries", when:"tonight", title:"Toothbrush, toothpaste, deodorant, body wash, shampoo", detail:"Round 1.", stops:["target"], effort:"low", energy:"low", group:"Tonight round 1 (done)" },
-  { id:"t-soap", when:"tonight", title:"Hand soap for the sink", stops:["target"], effort:"low", energy:"low", group:"Tonight round 1 (done)" },
-  { id:"t-duvet", when:"tonight", title:"Duvet or comforter (King)", detail:"Round 1.", stops:["target"], effort:"medium", energy:"medium", group:"Tonight round 1 (done)" },
-  { id:"t-pillow", when:"tonight", title:"Pillows", stops:["target"], effort:"low", energy:"low", group:"Tonight round 1 (done)" },
-  { id:"t-trash", when:"tonight", title:"Trash bags", stops:["target"], effort:"low", energy:"low", group:"Tonight round 1 (done)" },
-  { id:"t-water", when:"tonight", title:"Water + breakfast + snacks", stops:["target"], effort:"low", energy:"low", group:"Tonight round 1 (done)" },
-  { id:"t-paper", when:"tonight", title:"Paper towels", stops:["target"], effort:"low", energy:"low", group:"Tonight round 1 (done)" },
+  // MAYBE — furniture depending on time
+  { id:"d-furniture", when:"today", title:"Maybe one furniture looky-loo", detail:"Only if you've got time before Enzo pickup. HD Buttercup is closest / best vibe from the canals.", stops:["hdButtercup","westElm","cb2","livingSpaces"], effort:"medium", energy:"medium", fun:true, maybe:true, group:"If time before pickup" },
 
-  // TOMORROW
-  { id:"s-hdbuttercup", when:"tomorrow", title:"HD Buttercup browse", detail:"Best vibe for the 2 living-room chairs + coffee table.", stops:["hdButtercup"], effort:"medium", energy:"medium", fun:true, group:"Fun furniture crawl (pick any / all)" },
-  { id:"s-westelm", when:"tomorrow", title:"West Elm — Santa Monica", detail:"Dressers, coffee tables, nightstands.", stops:["westElm"], effort:"medium", energy:"medium", fun:true, group:"Fun furniture crawl (pick any / all)" },
-  { id:"s-cb2", when:"tomorrow", title:"CB2 — Santa Monica Promenade", detail:"Modern accents, dining bench, small tables.", stops:["cb2"], effort:"low", energy:"medium", fun:true, group:"Fun furniture crawl (pick any / all)" },
-  { id:"s-living", when:"tomorrow", title:"Living Spaces — Culver City", detail:"Widest selection, fastest delivery.", stops:["livingSpaces"], effort:"medium", energy:"medium", fun:true, group:"Fun furniture crawl (pick any / all)" },
-  { id:"s-kitchen", when:"tomorrow", title:"Kitchen starter kit", detail:"Plates, utensils, pan, dish soap, sponge, coffee.", stops:["target"], effort:"medium", energy:"medium", group:"Practical Sunday" },
-  { id:"s-cleaning", when:"tomorrow", title:"Cleaning basics", detail:"Spray, broom, laundry detergent.", stops:["target"], effort:"low", energy:"medium", group:"Practical Sunday" },
-  { id:"s-oldhouse", when:"tomorrow", title:"Move couch, desk, monitors from old house", detail:"Biggest lift. Morning when energy is high.", stops:[], effort:"high", energy:"high", group:"Practical Sunday" },
-  { id:"s-lamps", when:"tomorrow", title:"Bedroom floor lamp", stops:["bbb","target","westElm"], effort:"low", energy:"low", fun:true, group:"If energy is high" },
-  { id:"s-rugs", when:"tomorrow", title:"Scout a rug for the living room", stops:["bbb","westElm"], effort:"medium", energy:"medium", fun:true, group:"If energy is high" },
+  // PICKUP + drop
+  { id:"d-pickup", when:"today", title:"Pick up Enzo at West LA Dogs", detail:"2251 Federal Ave, LA 90064. Grooming pickup.", stops:["westLaDogs"], effort:"low", energy:"low", mandatory:true, group:"Pickup + drop" },
+  { id:"d-drop-denae", when:"today", title:"Drop DeNae + Enzo at her apartment", detail:"Address TBD — add it via the map link in the top banner or the address field below.", stops:["denaeHome"], effort:"low", energy:"low", mandatory:true, group:"Pickup + drop" },
 
-  // THIS WEEK
+  // SOLO — Bill after drop
+  { id:"s-essentials", when:"solo", title:"Manage essentials (Bill solo)", detail:"Whatever the apt still needs from Target/Culver City — top up on the way home.", stops:["target"], effort:"medium", energy:"medium", mandatory:true, group:"Bill solo" },
+  { id:"s-wifi", when:"solo", title:"Set up Wi-Fi at Paladia", detail:"Get the network up and the essentials online.", stops:["paladia"], effort:"low", energy:"low", mandatory:true, group:"Bill solo" },
+  { id:"s-admin", when:"solo", title:"Admin catch-up at home", detail:"See 'This week' tab for the queued items.", stops:["paladia"], effort:"low", energy:"low", group:"Bill solo" },
+
+  // THIS WEEK (kept from prior list)
+  { id:"w-internet", when:"week", title:"Schedule internet install", detail:"Frontier Fiber (Playa Vista is Frontier territory).", stops:[], effort:"low", energy:"low", group:"Admin & follow-ups" },
+  { id:"w-insurance", when:"week", title:"Bump Lemonade liability $100K → $300K", detail:"Lease minimum. Then send COI to Paladia.", stops:[], effort:"low", energy:"low", group:"Admin & follow-ups" },
+  { id:"w-gas", when:"week", title:"Call SoCalGas with Kyle's meter number", stops:[], effort:"low", energy:"low", group:"Admin & follow-ups" },
+  { id:"w-dmv", when:"week", title:"DMV address change + USPS mail forwarding", stops:[], effort:"low", energy:"low", group:"Admin & follow-ups" },
   { id:"w-dresser", when:"week", title:"Dressers for bedroom", detail:"Measure first. West Elm, Article, CB2, or Wayfair.", stops:["westElm"], effort:"medium", energy:"medium", group:"Furniture to order online" },
   { id:"w-dining", when:"week", title:"Dining nook — small table + 2 chairs + bench", stops:["westElm","cb2"], effort:"medium", energy:"medium", group:"Furniture to order online" },
   { id:"w-chairs", when:"week", title:"Two living-room chairs", detail:"After seeing the couch in the room.", stops:["hdButtercup","livingSpaces"], effort:"medium", energy:"medium", group:"Furniture to order online" },
   { id:"w-coffee", when:"week", title:"Coffee table for the bedroom", stops:["westElm","cb2"], effort:"low", energy:"low", group:"Furniture to order online" },
   { id:"w-nightstand", when:"week", title:"Nightstand / end table", stops:["westElm","cb2"], effort:"low", energy:"low", group:"Furniture to order online" },
-  { id:"w-internet", when:"week", title:"Schedule internet install", detail:"Frontier Fiber (Playa Vista is Frontier territory).", stops:[], effort:"low", energy:"low", group:"Admin & follow-ups" },
-  { id:"w-insurance", when:"week", title:"Bump Lemonade liability $100K → $300K", detail:"Lease minimum. Then send COI to Paladia.", stops:[], effort:"low", energy:"low", group:"Admin & follow-ups" },
-  { id:"w-gas", when:"week", title:"Call SoCalGas with Kyle's meter number", stops:[], effort:"low", energy:"low", group:"Admin & follow-ups" },
-  { id:"w-dmv", when:"week", title:"DMV address change + USPS mail forwarding", stops:[], effort:"low", energy:"low", group:"Admin & follow-ups" },
 ];
 
 // ---------- Local checks (per-device) ----------
-const LK_KEY = "paladia.moveday.public.v2.checks";
+const LK_KEY = "paladia.moveday.public.v3.checks";
 let localChecks = {};
 try { localChecks = JSON.parse(localStorage.getItem(LK_KEY) || "{}"); } catch(e) {}
 const saveLocal = () => { try { localStorage.setItem(LK_KEY, JSON.stringify(localChecks)); } catch(e) {} };
 
-// Round 1 tonight items are pre-done in this v2
-if (!localStorage.getItem("paladia.v2.initialized")) {
-  ["t-tp","t-towels","t-toiletries","t-soap","t-duvet","t-pillow","t-trash","t-water","t-paper"].forEach(id => localChecks[id] = true);
-  saveLocal();
-  localStorage.setItem("paladia.v2.initialized","1");
-}
-
 // ---------- Remote todos ----------
 let remoteTodos = [];
-let tab = "tonight";
-let energy = "all";
+let tab = "today";
 
 async function loadRemote() {
   const { data, error } = await sb.from("paladia_todos").select("*").eq("list_key", LIST_KEY).order("created_at", { ascending: true });
@@ -293,18 +315,11 @@ function setStatus(msg, cls) {
 }
 
 // ---------- Voice input (Web Speech API, iOS-hardened) ----------
-// iOS Safari quirks handled here:
-//   * SR must be created + started inside the same user-gesture tick
-//   * continuous:true is unreliable; use single-shot and auto-restart if the user still wants to talk
-//   * onend fires unexpectedly; only treat as "real stop" if we intended to stop or the user tapped again
-//   * getUserMedia primer helps Safari surface the permission prompt cleanly on some iOS builds
-//   * requires HTTPS (GitHub Pages is HTTPS ✓)
-
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let listening = false;         // user intent — true from tap-start until tap-stop or hard error
-let recog = null;              // current SpeechRecognition instance (single-shot per burst)
-let accumulated = "";          // committed final transcripts across bursts
-let permissionPrimed = false;  // getUserMedia primer run once
+let listening = false;
+let recog = null;
+let accumulated = "";
+let permissionPrimed = false;
 
 function voiceUnsupported(reason) {
   const micBtn = document.getElementById("micBtn");
@@ -335,7 +350,7 @@ async function primeMicPermission() {
 
 function buildRecog() {
   const r = new SR();
-  r.continuous = false;      // iOS reliability: single burst
+  r.continuous = false;
   r.interimResults = true;
   r.maxAlternatives = 1;
   r.lang = navigator.language || "en-US";
@@ -359,7 +374,6 @@ function buildRecog() {
   };
   r.onerror = (e) => {
     console.warn("Speech error:", e.error, e.message || "");
-    // Recoverable transient errors on iOS: no-speech, audio-capture, network. Silently retry if user still wants to.
     if (e.error === "no-speech" || e.error === "aborted") return;
     if (e.error === "not-allowed" || e.error === "service-not-allowed") {
       listening = false;
@@ -375,12 +389,10 @@ function buildRecog() {
     }
   };
   r.onend = () => {
-    // Single-burst ended. If user still wants to talk, restart in a microtask (iOS needs a beat).
     if (listening) {
       setTimeout(() => {
         if (!listening) return;
         try { r.start(); } catch (err) {
-          // Safari sometimes rejects rapid restart with InvalidStateError — rebuild recog.
           try {
             recog = buildRecog();
             recog.start();
@@ -407,7 +419,6 @@ window.toggleVoice = async function() {
   if (!SR) return;
   const inp = document.getElementById("addInput");
 
-  // Tap to stop
   if (listening) {
     listening = false;
     try { recog && recog.stop(); } catch (e) {}
@@ -415,15 +426,12 @@ window.toggleVoice = async function() {
     return;
   }
 
-  // Tap to start
-  // Prime permission on first tap so Safari's popup appears cleanly.
   const ok = await primeMicPermission();
   if (!ok) {
     alert("Microphone permission is required.\n\nEnable it: iPhone Settings → Safari → Microphone → Allow. Then reload this page.");
     return;
   }
 
-  // Start fresh: seed accumulated with what's already typed so we append cleanly
   accumulated = inp.value ? inp.value.trim() + " " : "";
   listening = true;
   try {
@@ -433,7 +441,6 @@ window.toggleVoice = async function() {
     console.warn("start() threw:", e);
     listening = false;
     stopUI();
-    // Wait a tick and try once more with a fresh instance (iOS InvalidStateError workaround)
     setTimeout(() => {
       if (listening) return;
       try {
@@ -449,7 +456,6 @@ window.toggleVoice = async function() {
   }
 };
 
-// Stop cleanly if the page goes to background (iOS pauses speech recognition anyway)
 document.addEventListener("visibilitychange", () => {
   if (document.hidden && listening) {
     listening = false;
@@ -474,25 +480,25 @@ loadRemote();
 // ---------- Parsing user input ----------
 const STORE_KEYWORDS = {
   target: ["target"],
-  bbb: ["homegoods","home goods","tj maxx","ross","marshalls"],
+  westLaDogs: ["west la dogs","groomer","enzo"],
   hdButtercup: ["hd buttercup","buttercup"],
   livingSpaces: ["living spaces"],
   westElm: ["west elm","westelm"],
   cb2: ["cb2","cb 2"],
   amazon: ["amazon","order online","online"],
+  paladia: ["home","apartment","paladia"],
 };
 
 const WHEN_KEYWORDS = {
-  tonight: ["tonight","now","asap"],
-  tomorrow: ["tomorrow","sunday","sun "],
-  week: ["this week","next week","monday","tuesday","wednesday","thursday","friday","later"],
+  today: ["today","now","asap","this afternoon"],
+  solo: ["solo","tonight","later tonight","after"],
+  week: ["this week","next week","monday","tuesday","wednesday","thursday","friday","later this week"],
 };
 
 function parseInput(raw) {
   const text = raw.trim();
   if (!text) return [];
 
-  // Detect global store & when for the whole input
   const lower = text.toLowerCase();
   let globalStore = null;
   for (const [sid, kws] of Object.entries(STORE_KEYWORDS)) {
@@ -503,32 +509,27 @@ function parseInput(raw) {
     if (kws.some(k => lower.includes(k))) { globalWhen = w; break; }
   }
 
-  // Strip store/when phrases from text before splitting into items
   let clean = text;
   const stripPhrases = [
     /\bfor target\b/gi, /\bat target\b/gi, /\bfrom target\b/gi,
-    /\bfor homegoods\b/gi, /\bat homegoods\b/gi,
     /\bfor west elm\b/gi, /\bat west elm\b/gi,
     /\bfor cb2\b/gi, /\bfor amazon\b/gi, /\bon amazon\b/gi,
-    /\btonight\b/gi, /\btomorrow\b/gi, /\bthis week\b/gi, /\bnext week\b/gi,
+    /\btoday\b/gi, /\btonight\b/gi, /\bthis week\b/gi, /\bnext week\b/gi, /\bsolo\b/gi,
   ];
   stripPhrases.forEach(re => clean = clean.replace(re, ""));
 
-  // Split on commas or " and " or " & "
   const parts = clean.split(/,|\s+and\s+|\s+&\s+/i).map(p => p.trim()).filter(Boolean);
   const items = parts.map(p => {
-    // Detect per-item store overrides
     let store = globalStore;
     const pLower = p.toLowerCase();
     for (const [sid, kws] of Object.entries(STORE_KEYWORDS)) {
       if (kws.some(k => pLower.includes(k))) { store = sid; break; }
     }
-    // Title case first letter
     const title = p.replace(/\s+/g, " ").trim().replace(/^./, c => c.toUpperCase());
     return {
       title,
       store: store || "",
-      when: globalWhen || "tonight",
+      when: globalWhen || "today",
     };
   });
   return items;
@@ -556,19 +557,20 @@ function openConfirm(items, raw) {
           <select data-i="${i}" data-f="store">
             <option value="">— none —</option>
             <option value="target"${it.store==="target"?" selected":""}>Target</option>
-            <option value="bbb"${it.store==="bbb"?" selected":""}>HomeGoods</option>
+            <option value="westLaDogs"${it.store==="westLaDogs"?" selected":""}>West LA Dogs</option>
             <option value="hdButtercup"${it.store==="hdButtercup"?" selected":""}>HD Buttercup</option>
             <option value="livingSpaces"${it.store==="livingSpaces"?" selected":""}>Living Spaces</option>
             <option value="westElm"${it.store==="westElm"?" selected":""}>West Elm</option>
             <option value="cb2"${it.store==="cb2"?" selected":""}>CB2</option>
+            <option value="paladia"${it.store==="paladia"?" selected":""}>Home (Paladia)</option>
             <option value="amazon"${it.store==="amazon"?" selected":""}>Amazon (online)</option>
           </select>
         </div>
         <div>
           <label>When</label>
           <select data-i="${i}" data-f="when">
-            <option value="tonight"${it.when==="tonight"?" selected":""}>Tonight</option>
-            <option value="tomorrow"${it.when==="tomorrow"?" selected":""}>Tomorrow</option>
+            <option value="today"${it.when==="today"?" selected":""}>Today</option>
+            <option value="solo"${it.when==="solo"?" selected":""}>Solo (Bill)</option>
             <option value="week"${it.when==="week"?" selected":""}>This week</option>
           </select>
         </div>
@@ -604,7 +606,6 @@ window.closeModal = function() {
 };
 
 window.saveConfirmed = async function() {
-  // Read edits back
   document.querySelectorAll("#parsedRows [data-i]").forEach(el => {
     const i = +el.dataset.i, f = el.dataset.f;
     if (window._pendingItems[i]) window._pendingItems[i][f] = el.value;
@@ -628,43 +629,43 @@ window.saveConfirmed = async function() {
 
 // ---------- Render ----------
 function setTab(t) { tab = t; render(); }
-function setEnergy(e) { energy = e; render(); }
-
-const ENERGY_OPTIONS = [
-  ["all","Show all"],
-  ["low","Low — just musts"],
-  ["medium","Mid — some extras"],
-  ["high","High — bring it on"],
-];
 
 function render() {
-  // count
-  const musts = BASE_ITEMS.filter(i => i.when === "tonight" && i.mandatory);
+  // count — how many "today" musts checked
+  const musts = BASE_ITEMS.filter(i => i.when === "today" && i.mandatory);
   const done = musts.filter(i => localChecks[i.id]).length;
-  document.getElementById("count").textContent = `${done}/${musts.length} tonight musts`;
+  document.getElementById("count").textContent = `${done}/${musts.length} today musts`;
 
   // tabs
-  ["tonight","tomorrow","week"].forEach(t => {
+  ["today","solo","week"].forEach(t => {
     document.getElementById("tab-"+t).className = "btn " + (tab === t ? "primary" : "");
   });
 
-  // energy
-  const er = document.getElementById("energyRow");
-  er.innerHTML = "";
-  ENERGY_OPTIONS.forEach(([val, label]) => {
-    const b = document.createElement("button");
-    b.className = "btn small " + (energy === val ? "primary" : "");
-    b.textContent = label;
-    b.onclick = () => setEnergy(val);
-    er.appendChild(b);
+  // route card
+  const routeEl = document.getElementById("routeList");
+  routeEl.innerHTML = "";
+  ROUTE.forEach(leg => {
+    const li = document.createElement("li");
+    let link = "";
+    if (leg.tel) {
+      link = `<a href="tel:${leg.tel}">${escapeHtml(leg.label)}</a>`;
+    } else if (leg.from && leg.to) {
+      link = `<a href="${legUrl(leg.from, leg.to)}" target="_blank" rel="noreferrer">${escapeHtml(leg.label)}</a>`;
+    } else if (leg.to) {
+      link = `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(leg.to)}" target="_blank" rel="noreferrer">${escapeHtml(leg.label)}</a>`;
+    } else {
+      link = escapeHtml(leg.label);
+    }
+    li.innerHTML = `${link} ${leg.maybe ? '<span class="badge b-maybe">Maybe</span>' : ''} ${leg.solo ? '<span class="badge b-solo">Solo</span>' : ''}<div class="m">${escapeHtml(leg.note || "")}</div>`;
+    routeEl.appendChild(li);
   });
 
   // combine base + remote
-  const baseFiltered = BASE_ITEMS.filter(i => i.when === tab).filter(i => energy === "all" || rank[i.energy] <= rank[energy]);
-  const remoteFiltered = remoteTodos.filter(t => (t.when_needed || "tonight") === tab).map(t => ({
+  const baseFiltered = BASE_ITEMS.filter(i => i.when === tab);
+  const remoteFiltered = remoteTodos.filter(t => (t.when_needed || "today") === tab).map(t => ({
     id: "rem-" + t.id,
     remoteId: t.id,
-    when: t.when_needed || "tonight",
+    when: t.when_needed || "today",
     title: t.title,
     detail: t.note || "",
     stops: t.store ? [t.store] : [],
@@ -683,9 +684,8 @@ function render() {
   const sectionsEl = document.getElementById("sections");
   sectionsEl.innerHTML = "";
   if (items.length === 0) {
-    sectionsEl.innerHTML = '<p style="text-align:center;color:var(--muted);padding:24px 0">Nothing yet. Add items with the bar below.</p>';
+    sectionsEl.innerHTML = '<p style="text-align:center;color:var(--muted);padding:24px 0">Nothing yet. Add items with the bar above.</p>';
   }
-  // Sort groups: user-added first for tonight tab
   const groupOrder = Object.keys(groups).sort((a,b) => {
     const aUser = a.startsWith("Added by") ? 0 : 1;
     const bUser = b.startsWith("Added by") ? 0 : 1;
@@ -702,7 +702,7 @@ function render() {
     sectionsEl.appendChild(sec);
   });
 
-  // stops
+  // stops list
   const s = document.getElementById("stopsList");
   s.innerHTML = "";
   Object.values(STOPS).forEach(st => {
@@ -736,6 +736,7 @@ function itemEl(i) {
   body.className = "body";
   const badges = [];
   if (i.mandatory) badges.push('<span class="badge b-must">Must</span>');
+  if (i.maybe) badges.push('<span class="badge b-maybe">Maybe</span>');
   if (i.userAdded) badges.push('<span class="badge b-added">✎ Added</span>');
   if (i.fun) badges.push('<span class="badge b-fun">✨ Fun</span>');
   const maps = (i.stops || []).map(sid => {
@@ -746,7 +747,6 @@ function itemEl(i) {
     return `<a href="${mapUrl(st.addr)}" target="_blank" rel="noreferrer">📍 ${escapeHtml(label)}</a>`;
   }).join("");
   const whoLine = i.userAdded && i.addedBy ? `<div class="who">${escapeHtml(i.addedBy)} added</div>` : "";
-  const delBtn = i.userAdded ? `<button class="del" title="Delete" onclick="deleteRemote(${i.remoteId})">✕</button>` : "";
   body.innerHTML = `
     ${whoLine}
     <div class="title">${escapeHtml(i.title)}</div>
@@ -777,7 +777,6 @@ window.deleteRemote = async function(id) {
 function resetLocalChecks() {
   if (!confirm("Clear this device's checks on the built-in items? (Doesn't affect shared items.)")) return;
   localChecks = {}; saveLocal();
-  localStorage.removeItem("paladia.v2.initialized");
   location.reload();
 }
 
