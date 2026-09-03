@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Paladia · Sunday Drive</title>
+<title>Paladia · Drive Day</title>
 <meta name="theme-color" content="#0b0b0e" />
 <style>
   :root {
@@ -145,7 +145,7 @@
 </header>
 <main>
   <div class="intro">
-    <h1>Sunday, Aug 16 — On the road</h1>
+    <h1 id="dateHeader">On the road</h1>
     <p>Yesterday's list is all checked. You're leaving Whole Foods PV now. Enzo's grooming pickup at West LA Dogs is around 2:30 PM (unconfirmed — call to check). Then drop DeNae, then Bill goes solo for essentials + Wi-Fi/admin.</p>
     <div class="banner">
       <div class="h">🚗 Next up — drive-by the bungalow</div>
@@ -785,6 +785,14 @@ function resetLocalChecks() {
 
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function escapeAttr(s) { return escapeHtml(s); }
+
+// ---------- Dynamic date header ----------
+(function () {
+  const now = new Date();
+  const opts = { weekday: "long", month: "short", day: "numeric" };
+  const label = now.toLocaleDateString("en-US", opts);
+  document.getElementById("dateHeader").textContent = label + " \u2014 On the road";
+})();
 
 render();
 </script>
